@@ -7,9 +7,15 @@ use App\Models\User;
 
 class RegisterUserAction
 {
-    public function __construct(private AuthService $auth) {}
-    public function execute(array $validated): User
+    private AuthService $authService;
+
+    public function __construct(AuthService $authService) 
     {
-        return $this->auth->register($validated);
+        $this->authService = $authService;
+    }
+
+    public function register(array $validated): User
+    {
+        return $this->authService->register($validated);
     }
 }
