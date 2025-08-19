@@ -4,11 +4,11 @@ namespace App\Actions\Auth;
 
 use App\Services\Auth\AuthService;
 
-class ResetPasswordAction
+class SendPasswordResetLinkAction
 {
     public function __construct(private AuthService $auth) {}
-    public function execute(array $data): string
+    public function execute(string $email): string
     {
-        return $this->auth->resetPassword($data);
+        return $this->auth->sendResetLink($email);
     }
 }
