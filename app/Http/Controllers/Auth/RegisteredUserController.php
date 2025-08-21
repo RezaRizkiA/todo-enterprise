@@ -34,7 +34,6 @@ class RegisteredUserController extends Controller
     {
         $user = $action->register($request->validated());
         Auth::login($user);
-
         return to_route('dashboard');
     }
 }
