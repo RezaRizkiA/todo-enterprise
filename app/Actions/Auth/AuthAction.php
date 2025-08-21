@@ -15,7 +15,7 @@ class AuthAction
     public function login(LoginRequest $request): RedirectResponse
     {
         $data = $request->validated();
-  
+
         $result = $this->authService->login(
             email: $data['email'],
             password: $data['password'],
@@ -43,7 +43,9 @@ class AuthAction
     public function register(RegisterRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $user = $this->authService->register($data);
+        $this->authService->register($data);
+        $request->session()->regenerate();
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     public function logout(Request $request): RedirectResponse

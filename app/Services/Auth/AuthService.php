@@ -20,25 +20,30 @@ class AuthService
         private Hasher $hasher
     ) {}
 
-    public function register(array $data): Authenticatable
+    public function register(array $data, bool $remember = false): Authenticatable
     {
-        return DB::transaction(function () {
+        $user = DB::transaction(function () use ($data) {
             $user = $this->userRepository->create([
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => $data['password'],
             ]);
+            event(new Registered($user));
+            return $user;
         });
+
+        $this->guard->login($user, $remember);
+        return $user;
     }
 
     public function login(string $email, string $password, bool $remember, string $ip): array
     {
         $key = $this->throttleKey($email, $ip);
 
-        if(RateLimiter::tooManyAttempts($key, 5)){
+        if (RateLimiter::tooManyAttempts($key, 5)) {
             return ['ok' => false, 'reason' => 'throttled', 'seconds' => RateLimiter::availableIn($key)];
         }
-        
+
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user) {
@@ -68,7 +73,7 @@ class AuthService
 
     private function throttleKey(string $email, string $ip): string
     {
-        return Str::transliterate(Str::lower($email). '|' .$ip);
+        return Str::transliterate(Str::lower($email) . '|' . $ip);
     }
 
     public function logout(): void
