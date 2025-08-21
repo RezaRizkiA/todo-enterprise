@@ -20,7 +20,7 @@ class RegisterUserAction
         return DB::transaction(function () use ($validated) {
             $user = $this->authService->register($validated);
             $this->profiles->createDefaultFor($user);
-            
+            $user->assignRole('member');
             DB::afterCommit(function() use ($user) {
                 event(new Registered($user));
             });
