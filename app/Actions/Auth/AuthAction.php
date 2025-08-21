@@ -3,6 +3,7 @@
 namespace App\Actions\Auth;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,6 +38,12 @@ class AuthAction
 
         $request->session()->regenerate();
         return redirect()->intended(route('dashboard', absolute: false));
+    }
+
+    public function register(RegisterRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+        $user = $this->authService->register($data);
     }
 
     public function logout(Request $request): RedirectResponse

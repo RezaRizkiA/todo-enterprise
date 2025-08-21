@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\Auth\AuthAction;
 use App\Actions\Auth\RegisterUserAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -30,10 +31,8 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(RegisterRequest $request, RegisterUserAction $action): RedirectResponse
+    public function store(RegisterRequest $request, AuthAction $authAction): RedirectResponse
     {
-        $user = $action->register($request->validated());
-        Auth::login($user);
-        return to_route('dashboard');
+        return $authAction->register($request);
     }
 }

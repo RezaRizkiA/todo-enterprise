@@ -5,8 +5,9 @@ namespace App\Services\Auth;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\{Auth, Hash, Log, Password, RateLimiter};
+use Illuminate\Support\Facades\{Auth, DB, Hash, Log, Password, RateLimiter};
 use Illuminate\Auth\Events\{Registered, PasswordReset};
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Str;
@@ -19,16 +20,16 @@ class AuthService
         private Hasher $hasher
     ) {}
 
-    // public function register(array $data): User
-    // {
-    //     $user = $this->users->create([
-    //         'name'     => $data['name'],
-    //         'email'    => strtolower($data['email']),
-    //         'password' => Hash::make($data['password']),
-    //     ]);
-    //     // event(new Registered($user));
-    //     return $user;
-    // }
+    public function register(array $data): Authenticatable
+    {
+        return DB::transaction(function () {
+            $user = $this->userRepository->create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+            ]);
+        });
+    }
 
     public function login(string $email, string $password, bool $remember, string $ip): array
     {
@@ -65,15 +66,16 @@ class AuthService
         return ['ok' => true];
     }
 
+    private function throttleKey(string $email, string $ip): string
+    {
+        return Str::transliterate(Str::lower($email). '|' .$ip);
+    }
+
     public function logout(): void
     {
         $this->guard->logout();
     }
 
-    private function throttleKey(string $email, string $ip): string
-    {
-        return Str::transliterate(Str::lower($email). '|' .$ip);
-    }
 
     // public function sendResetLink(string $email): string
     // {

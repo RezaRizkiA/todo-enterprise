@@ -11,4 +11,9 @@ class UserRepository
     {
         return User::where('email', $email)->first();
     }
+
+    public function create(array $attributes): Authenticatable
+    {
+        return User::create($attributes);
+    }
 }
