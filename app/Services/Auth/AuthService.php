@@ -8,16 +8,19 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\{Auth, DB, Hash, Log, Password, RateLimiter};
 use Illuminate\Auth\Events\{Registered, PasswordReset};
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Password as PasswordFacade;
 
 class AuthService
 {
     public function __construct(
         private StatefulGuard $guard,
         private UserRepository $userRepository,
-        private Hasher $hasher
+        private Hasher $hasher,
+        private PasswordBroker $passwords,
     ) {}
 
     public function register(array $data, bool $remember = false): Authenticatable
@@ -82,10 +85,11 @@ class AuthService
     }
 
 
-    // public function sendResetLink(string $email): string
-    // {
-    //     return Password::sendResetLink(['email' => $email]);
-    // }
+    public function sendResetLink(string $email): array
+    {
+        $status = $this->passwords->sendResetLink(['email' => $email]);
+        return ['ok' => $status === PasswordFacade::RESET_LINK_SENT, 'status' => $status];
+    }
 
     // public function resetPassword(array $data): string
     // {

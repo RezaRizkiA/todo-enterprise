@@ -3,6 +3,7 @@
 namespace App\Actions\Auth;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\PasswordResetLinkRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\RedirectResponse;
@@ -54,5 +55,16 @@ class AuthAction
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+    }
+
+    public function sendPasswordResetLink(PasswordResetLinkRequest $request): RedirectResponse
+    {
+        $email = (string) $request->validated('email');
+        $result = $this->authService->sendResetLink($email);
+
+        if ($result['ok']) {
+            return back()->with('status', __($result['status']));
+        }
+        return back()->withErrors(['email' => __($result['status'])]);
     }
 }
