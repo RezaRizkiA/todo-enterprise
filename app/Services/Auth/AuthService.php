@@ -2,11 +2,9 @@
 
 namespace App\Services\Auth;
 
-use App\Models\User;
-use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\{Auth, DB, Hash, Log, Password, RateLimiter};
-use Illuminate\Auth\Events\{Registered, PasswordReset};
+use Illuminate\Support\Facades\{DB, Log, RateLimiter};
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Contracts\Auth\StatefulGuard;
