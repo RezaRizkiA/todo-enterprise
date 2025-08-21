@@ -26,7 +26,7 @@ class AuthService
             $user = $this->userRepository->create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => $data['password'],
+                'password' => $this->hasher->make($data['password']),
             ]);
             event(new Registered($user));
             return $user;

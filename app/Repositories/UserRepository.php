@@ -7,7 +7,10 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class UserRepository
 {
-    public function findByEmail(string $email): ?User
+    /**
+     * @return User|null
+     */
+    public function findByEmail(string $email): ?Authenticatable
     {
         return User::where('email', $email)->first();
     }
