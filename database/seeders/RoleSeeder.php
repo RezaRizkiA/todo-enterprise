@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -13,7 +14,12 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::findOrCreate('admin', 'web');
-        Role::findOrCreate('member', 'web');
+        $admin = Role::findOrCreate('admin', 'web');
+        $member = Role::findOrCreate('member', 'web');
+
+        $user = User::find(1);
+        if($user && !$user->hasRole('admin')){
+            $user->assignRole($admin);
+        }
     }
 }
