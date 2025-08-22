@@ -3,9 +3,11 @@
 namespace App\Services\Auth;
 
 use App\Repositories\UserRepository;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\{DB, Log, RateLimiter};
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Hashing\Hasher;
@@ -89,12 +91,27 @@ class AuthService
         return ['ok' => $status === PasswordFacade::RESET_LINK_SENT, 'status' => $status];
     }
 
-    // public function resetPassword(array $data): string
-    // {
-    //     return Password::reset($data, function (User $user, string $password) {
-    //         $this->users->updatePassword($user, Hash::make($password));
-    //         $user->setRememberToken(Str::random(60));
-    //         event(new PasswordReset($user));
-    //     });
-    // }
+    public function resetPassword(
+        string $email, string $token, string $newPassword, string $passwordConfimation
+    ): array
+    {
+        $status = $this->passwords->reset(
+            [
+                'email' => $email,
+                'token' => $token,
+                'password' => $newPassword,
+                'confirmation_password' => $passwordConfimation
+            ],
+            function (CanResetPassword $user) use($newPassword){
+                $user->forceFill([
+                    'password' => $this->hasher->make($newPassword),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        return['ok' => $status === PasswordFacade::PASSWORD_RESET, 'status' => $status];
+    }
 }

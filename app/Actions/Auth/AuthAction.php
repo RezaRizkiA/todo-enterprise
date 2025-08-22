@@ -3,6 +3,7 @@
 namespace App\Actions\Auth;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\NewPasswordRequest;
 use App\Http\Requests\Auth\PasswordResetLinkRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\Auth\AuthService;
@@ -64,6 +65,22 @@ class AuthAction
 
         if ($result['ok']) {
             return back()->with('status', __($result['status']));
+        }
+        return back()->withErrors(['email' => __($result['status'])]);
+    }
+
+    public function resetPassword(NewPasswordRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+        $result = $this->authService->resetPassword(
+            email: $data['email'],
+            token: $data['token'],
+            newPassword: $data['password'],
+            passwordConfimation: (string) $request->input('password_confimation')
+        );
+
+        if ($result['ok']) {
+            return to_route('login')->with('status', __($result['status']));
         }
         return back()->withErrors(['email' => __($result['status'])]);
     }
