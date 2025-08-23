@@ -43,7 +43,7 @@ class AuthAction
         if ($user && $user->hasRole('admin')) {
             return redirect()->intended(route('dashboard', absolute: false));
         }
-        return redirect()->intended(route('home', absolute: false));
+        return redirect()->intended(route('todos.index', absolute: false));
     }
 
     public function register(RegisterRequest $request): RedirectResponse

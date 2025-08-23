@@ -25,4 +25,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+use App\Http\Controllers\TodosController;
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/todos', [TodosController::class, 'index'])->name('todos.index');
+    Route::post('/todos', [TodosController::class, 'store'])->name('todos.store');
+
+    // base endpoints biar composable gampang
+    Route::patch('/todos/update/{id}', [TodosController::class, 'update'])->name('todos.update.base');
+    Route::patch('/todos/toggle/{id}', [TodosController::class, 'toggle'])->name('todos.toggle.base');
+    Route::delete('/todos/destroy/{id}', [TodosController::class, 'destroy'])->name('todos.destroy.base');
+});
+
+
 require __DIR__ . '/auth.php';
