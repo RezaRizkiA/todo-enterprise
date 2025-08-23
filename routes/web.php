@@ -16,7 +16,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
-    Route::get('/admin', AdminDashboardController::class)->name('admin.dashboard');
+    Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
 });
 
 // Route::get('/dashboard', function () {

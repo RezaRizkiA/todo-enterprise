@@ -39,7 +39,11 @@ class AuthAction
         }
 
         $request->session()->regenerate();
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = $request->user();
+        if($user && $user->hasRole('admin')){
+            return redirect()->intended(route('dashboard', absolute:false));
+        }
+        return redirect()->intended(route('home', absolute: false));
     }
 
     public function register(RegisterRequest $request): RedirectResponse
