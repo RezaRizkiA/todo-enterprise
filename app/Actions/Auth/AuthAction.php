@@ -40,8 +40,8 @@ class AuthAction
 
         $request->session()->regenerate();
         $user = $request->user();
-        if($user && $user->hasRole('admin')){
-            return redirect()->intended(route('dashboard', absolute:false));
+        if ($user && $user->hasRole('admin')) {
+            return redirect()->intended(route('dashboard', absolute: false));
         }
         return redirect()->intended(route('home', absolute: false));
     }
@@ -51,7 +51,11 @@ class AuthAction
         $data = $request->validated();
         $this->authService->register($data);
         $request->session()->regenerate();
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = $request->user();
+        if ($user && $user->hasRole('admin')) {
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+        return redirect()->intended(route('home', absolute: false));
     }
 
     public function logout(Request $request): RedirectResponse

@@ -14,6 +14,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Password as PasswordFacade;
 
+
 class AuthService
 {
     public function __construct(
@@ -31,6 +32,7 @@ class AuthService
                 'email' => $data['email'],
                 'password' => $this->hasher->make($data['password']),
             ]);
+            $user->assignRole('member');
             event(new Registered($user));
             return $user;
         });
